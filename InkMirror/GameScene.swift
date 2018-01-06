@@ -8,12 +8,14 @@
 
 import SpriteKit
 import GameplayKit
+import RandomColorSwift
 
 class GameScene: SKScene {
     
     private var spinnyNode : SKShapeNode?
     private var lastPoint = CGPoint(x: 0, y: 0)
     private var lastDrawAt = 0.0
+    private var currentColor = SKColor.white
     
     override func didMove(to view: SKView) {
         
@@ -41,6 +43,7 @@ class GameScene: SKScene {
     
     func touchUp(atPoint pos : CGPoint) {
         addNode(pos)
+        currentColor = randomColor(luminosity: .light)
     }
     
     func lineWithPoints(_ a: CGPoint, _ b: CGPoint) {
