@@ -13,6 +13,7 @@ class GameScene: SKScene {
     
     private var spinnyNode : SKShapeNode?
     private var lastPoint = CGPoint(x: 0, y: 0)
+    private var lastDrawAt = 0.0
     
     override func didMove(to view: SKView) {
         
@@ -42,24 +43,44 @@ class GameScene: SKScene {
         addNode(pos)
     }
     
-    func addNode(_ pos: CGPoint) {
-        let line = SKShapeNode(points: [lastPoint, pos])
+    func lineWithPoints(_ a: CGPoint, _ b: CGPoint) {
+        let path = CGMutablePath.init()
+        path.move(to: a)
+        path.addLine(to: b)
+        
+        let line = SKShapeNode(path: path)
         line.strokeColor = .white
+        line.lineWidth = 5
         line.run(SKAction.sequence([
             SKAction.wait(forDuration: 1),
             SKAction.removeFromParent()
-        ]))
+            ]))
         self.addChild(line)
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.fillColor = .white
-            self.addChild(n)
+    }
+    
+    func addNode(_ pos: CGPoint) {
+        let now = NSDate().timeIntervalSince1970
+        if (now - lastDrawAt < 0.03) {
+            return;
         }
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = CGPoint(x: -1 * pos.x, y: pos.y)
-            n.fillColor = .white
-            self.addChild(n)
-        }
+        lastDrawAt = now
+        lineWithPoints(lastPoint, pos)
+        lineWithPoints(
+            CGPoint(x: -1 * lastPoint.x, y: lastPoint.y),
+            CGPoint(x: -1 * pos.x, y: pos.y)
+        )
+        
+        lastPoint = pos
+//        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+//            n.position = pos
+//            n.fillColor = .white
+//            self.addChild(n)
+//        }
+//        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+//            n.position = CGPoint(x: -1 * pos.x, y: pos.y)
+//            n.fillColor = .white
+//            self.addChild(n)
+//        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
