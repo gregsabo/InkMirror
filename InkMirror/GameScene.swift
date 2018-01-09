@@ -9,6 +9,7 @@
 import SpriteKit
 import GameplayKit
 import RandomColorSwift
+import SwiftRandom
 
 class GameScene: SKScene {
     
@@ -16,6 +17,7 @@ class GameScene: SKScene {
     private var lastPoint = CGPoint(x: 0, y: 0)
     private var lastDrawAt = 0.0
     private var currentColor = SKColor.white
+    private var currentLineWidth = 10
     
     override func didMove(to view: SKView) {
         
@@ -27,14 +29,16 @@ class GameScene: SKScene {
             spinnyNode.lineWidth = 2.5
             
 //            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 10)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 1),
-                                              SKAction.removeFromParent()]))
+            spinnyNode.run(SKAction.sequence([
+                SKAction.wait(forDuration: 1),
+                SKAction.removeFromParent()
+            ]))
         }
     }
     
     
     func touchDown(atPoint pos : CGPoint) {
-        addNode(pos)
+        lastPoint = pos
     }
     
     func touchMoved(toPoint pos : CGPoint) {
@@ -52,12 +56,22 @@ class GameScene: SKScene {
         path.addLine(to: b)
         
         let line = SKShapeNode(path: path)
-        line.strokeColor = .white
-        line.lineWidth = 5
+        line.strokeColor = currentColor
+        line.lineWidth = CGFloat(currentLineWidth)
+        
+        var movement : SKAction;
+        if b.x > 0 {
+            movement = SKAction.moveBy(x: -1 * frame.width, y: 0, duration: 1)
+        } else {
+            movement = SKAction.moveBy(x: frame.width, y: 0, duration: 1)
+        }
+        movement.timingMode = .easeIn
+        
         line.run(SKAction.sequence([
-            SKAction.wait(forDuration: 1),
+            SKAction.wait(forDuration: 5),
+            movement,
             SKAction.removeFromParent()
-            ]))
+        ]))
         self.addChild(line)
     }
     
